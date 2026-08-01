@@ -175,7 +175,7 @@ Registry.CratesAndRewards = {
 			ChromaLaser = {rarity = 5},
 		},
 	},
-	
+
 	Season1 = {
 		MysteryBox1 = {
 			-- Common (Rarity 1)
@@ -220,7 +220,21 @@ Registry.CratesAndRewards = {
 	}
 }
 
--- API
+Registry.SmallestMaps = {
+	"House2",
+	"Hotel2",
+	"Yacht",
+	"PoliceStation",
+	"Office3",
+	"Bank2",
+	"Hospital3",
+	"Workplace",
+	"ResearchFacility",
+	"Mansion2",
+	"Factory",
+	"MilBase",
+	"BioLab"
+}
 
 Registry.Maps = {
 	"Yacht",
@@ -237,5 +251,52 @@ Registry.Maps = {
 	"Factory",
 	"BioLab",
 }
+
+-- API
+
+function levenshtein(str1: string, str2: string)
+	local len1, len2 = #str1, #str2
+	if len1 == 0 then return len2 end
+	if len2 == 0 then return len1 end
+
+	local matrix = {}
+	for i = 0, len1 do matrix[i] = {[0] = i} end
+	for j = 0, len2 do matrix[0][j] = j end
+
+	for i = 1, len1 do
+		for j = 1, len2 do
+			local cost = (str1:byte(i) == str2:byte(j)) and 0 or 1
+			matrix[i][j] = math.min(
+				matrix[i - 1][j] + 1,       -- Deletion
+				matrix[i][j - 1] + 1,       -- Insertion
+				matrix[i - 1][j - 1] + cost -- Substitution
+			)
+		end
+	end
+	return matrix[len1][len2]
+end
+
+function accuracy_ratio(str1: string, str2: string)
+	if str1 == str2 then return 1.0 end
+
+	local max_len = math.max(#str1, #str2)
+	if max_len == 0 then return 1.0 end
+
+	local distance = levenshtein(str1, str2)
+	return 1.0 - (distance / max_len)
+end
+
+Registry.GetClosestMapTo = function(name: string)
+	local bestMatch = nil
+	local bestRatio = 0
+	for _, mapName in ipairs(Registry.Maps) do
+		local ratio = accuracy_ratio(name, mapName)
+		if ratio > bestRatio then
+			bestRatio = ratio
+			bestMatch = mapName
+		end
+	end
+	return bestMatch
+end
 
 return Registry
