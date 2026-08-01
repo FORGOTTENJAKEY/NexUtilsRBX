@@ -233,7 +233,8 @@ Registry.SmallestMaps = {
 	"Mansion2",
 	"Factory",
 	"MilBase",
-	"BioLab"
+	"BioLab",
+	"Pier"
 }
 
 Registry.Maps = {
@@ -250,6 +251,7 @@ Registry.Maps = {
 	"Hospital3",
 	"Factory",
 	"BioLab",
+	"Pier"
 }
 
 -- API
